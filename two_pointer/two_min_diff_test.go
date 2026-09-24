@@ -8,14 +8,14 @@ import (
 // https://leetcode.cn/problems/smallest-difference-lcci/
 // 计算最小差绝对值
 //
-// 算法思路：
+// 算法思路，类似合并两个有序数组：
 // 1. 排序两个数组
 // 2. 创建两个指针 pa、pb，分别指向两个数组的头元素
-// 3. 比较两个指针，以根据“找出最小差”的目标，决定移动哪个指针
-//      pa > pb, pb++
-//      pa < pb, pa++
-//      pa == pb, 差值绝对值为 0，肯定是最小差值绝对值，退出循环，直接返回
-//      任何一个数组遍历完就结束循环
+// 3. 重复下述步骤。任何一个数组遍历完就结束循环
+//      比较两个元素，根据“找出最小差”目标，决定移动哪个指针
+//      a[pa] > a[pb], pb++
+//      a[pa] < a[pb], pa++
+//      a[pa] == a[pb], 差值绝对值为 0，肯定是最小差值绝对值，退出循环，直接返回
 
 func smallestDifference(a []int, b []int) int {
 	result := math.MaxInt
