@@ -1,4 +1,4 @@
-package binary_tree
+package common
 
 type TreeNode struct {
 	Val   int

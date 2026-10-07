@@ -1,7 +1,11 @@
 package binary_tree
 
+import (
+	"github.com/ikonglong/go-algorithm/common"
+)
+
 // 跟 binary_tree/node.go 中 ValList 实现相比较，这个实现优雅多了
-func levelOrder(root *TreeNode) [][]int {
+func levelOrder(root *common.TreeNode) [][]int {
 	if root == nil {
 		return nil
 	}
@@ -10,7 +14,7 @@ func levelOrder(root *TreeNode) [][]int {
 	// 再将节点值添加到该层的值列表中，同时将下一层节点添加到队列中。
 	// 注意，每次迭代开始时队列的大小即为这一层的节点数量。
 	result := make([][]int, 0)
-	nodeQue := make([]*TreeNode, 0)
+	nodeQue := make([]*common.TreeNode, 0)
 	nodeQue = append(nodeQue, root)
 	for len(nodeQue) > 0 { // 队列中没有节点了，表明已遍历完所有的树节点
 		levelLen := len(nodeQue)

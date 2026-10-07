@@ -1,14 +1,18 @@
 package binary_tree
 
-import "testing"
+import (
+	"testing"
 
-func inorderTraversal(root *TreeNode) []int {
+	"github.com/ikonglong/go-algorithm/common"
+)
+
+func inorderTraversal(root *common.TreeNode) []int {
 	result := make([]int, 0)
 	inorderTraversalRecurse(root, &result)
 	return result
 }
 
-func inorderTraversalRecurse(root *TreeNode, result *[]int) {
+func inorderTraversalRecurse(root *common.TreeNode, result *[]int) {
 	// root 就是当前节点
 	if root == nil {
 		return
@@ -20,7 +24,7 @@ func inorderTraversalRecurse(root *TreeNode, result *[]int) {
 }
 
 // 中序遍历
-func inorderTraversal_bad(root *TreeNode) []int {
+func inorderTraversal_bad(root *common.TreeNode) []int {
 	if root == nil {
 		return []int{}
 	}
@@ -83,7 +87,7 @@ func inorderTraversal_bad(root *TreeNode) []int {
 //	if 条件 {
 //	  return
 //	}
-func inorderTraversal_bad2(root *TreeNode) []int {
+func inorderTraversal_bad2(root *common.TreeNode) []int {
 	if root == nil {
 		return []int{}
 	}
