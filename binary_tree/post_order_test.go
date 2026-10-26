@@ -1,16 +1,12 @@
 package binary_tree
 
-import (
-	"github.com/ikonglong/go-algorithm/common"
-)
-
-func postorderTraversal(root *common.TreeNode) []int {
+func postorderTraversal(root *TreeNode) []int {
 	result := make([]int, 0)
 	postorderTraversalRecurse(root, &result)
 	return result
 }
 
-func postorderTraversalRecurse(root *common.TreeNode, result *[]int) {
+func postorderTraversalRecurse(root *TreeNode, result *[]int) {
 	if root == nil {
 		return
 	}

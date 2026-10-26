@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+// https://leetcode.cn/problems/intersection-of-two-arrays
+
 func intersection(nums1 []int, nums2 []int) []int {
 	slices.Sort(nums1)
 	slices.Sort(nums2)
