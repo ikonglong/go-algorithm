@@ -8,6 +8,8 @@ func isValidBST(root *TreeNode) bool {
 	}
 	isValid := true
 	var minMax func(*TreeNode) (int, int)
+	// 从另一个角度思考：调用此函数时传入 root，但并不知道这棵树是其父节点的左子节点
+	// 还是右子节点，因此只能把树中的最大值和最小值都求出来
 	minMax = func(root *TreeNode) (min, max int) {
 		// 初始化 min、max，可简化处理 left 或 right 为空的情形
 		// 若 left 和 right 都为空，min、max 都应该等于根节点的值

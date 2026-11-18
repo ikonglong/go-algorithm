@@ -1,4 +1,4 @@
-package linkedlist
+package common
 
 import (
 	"slices"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValList(t *testing.T) {
+func TestListValList(t *testing.T) {
 	list := []int{1, 2, 3, 4, 5}
 	linked := NewLinked(list)
 	vList := linked.ValList()

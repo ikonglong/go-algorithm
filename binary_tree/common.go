@@ -3,6 +3,7 @@ package binary_tree
 import "github.com/ikonglong/go-algorithm/common"
 
 type TreeNode = common.TreeNode
+type ListNode = common.ListNode
 
 // 函数调用栈帧
 type CallFrame struct {

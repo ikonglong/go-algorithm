@@ -15,7 +15,7 @@ func TestNewTree(t *testing.T) {
 	assert.Equal(t, levelOrderList, vList)
 }
 
-func TestValList(t *testing.T) {
+func TestTreeValList(t *testing.T) {
 	root := &TreeNode{
 		Val: 3,
 		Left: &TreeNode{
