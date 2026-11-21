@@ -10,7 +10,7 @@ package linkedlist
 // 		否则，将 previous 链接至 current 的下一个节点（删除了 current），
 // 		再移动 current 至下一个节点
 
-func removeDuplicateNodes(head *ListNode) *ListNode {
+func deleteDuplicates(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
 		return head
 	}
@@ -44,7 +44,7 @@ func removeDuplicateNodes(head *ListNode) *ListNode {
 // 			runner 不能指向被查看节点，它总是指向被查看节点的前驱节点。也就是说，
 // 			实际检查的不是 runner，而是 runner.next
 
-func removeDuplicateNodes2(head *ListNode) *ListNode {
+func deleteDuplicates2(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
 		return head
 	}
@@ -70,6 +70,54 @@ func removeDuplicateNodes2(head *ListNode) *ListNode {
 		}
 
 		current = current.Next
+	}
+
+	return head
+}
+
+// 算法思路：
+//  1. 创建两个指针 prev、curr，分别指向第一、二个节点
+//  2. 使 curr 遍历链表：
+//     若 curr.val != prev.val，则向右移动 prev, curr
+//     若相等，删除 curr，并将 curr 指向删除前的 curr.next，下次迭代比较 prev 跟移动后的 curr
+func deleteDuplicates3(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	prev, curr := head, head.Next
+	for curr != nil {
+		if curr.Val != prev.Val {
+			prev = curr
+			curr = curr.Next
+			continue
+		}
+
+		// 值相等，则删除当前节点
+		prev.Next = curr.Next
+		curr = curr.Next
+	}
+
+	return head
+}
+
+func deleteDuplicates4(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	valMap := make(map[int]struct{})
+	valMap[head.Val] = struct{}{}
+	curr := head
+	for curr!=nil&&curr.Next!=nil {
+		if _, found:=valMap[curr.Next.Val]; found {
+			curr.Next = curr.Next.Next
+			// 因为 curr.next 变化了，所以不应该移动 curr
+			// curr = curr.Next
+		} else {
+			valMap[curr.Next.Val] = struct{}{}
+			curr = curr.Next
+		}
 	}
 
 	return head

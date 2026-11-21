@@ -4,9 +4,9 @@ package recurse
 // leetcode name: trainningPlan
 
 // 采用递归实现
-// 1. 合并两个有序链表跟合并它们各自的子链表，解决思路一样
-// 2. merge(head1, head2) = 合并 head1、head2，再将 merge(head1.next, head2.next) 接在尾节点后
-//    任何一个 head 为 null，就返回另一个链表的剩余部分（即对应 head）
+// 1. 原问题跟子问题的解决思路一样：
+// 	  合并两个有序链表 跟 先把两个链表中较小的头节点摘除，合并剩余部分后再头插 思路类似
+// 2. 最小子问题：任何一个链表为空，就返回另一个。两个链表可能同时为空
 
 func mergeTwoSortedLinked(l1 *ListNode, l2 *ListNode) *ListNode {
 	var mergeRecurse func(*ListNode, *ListNode) *ListNode

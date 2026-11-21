@@ -4,10 +4,12 @@ package linkedlist
 // 从链表头到尾，依次是个位数、十位数、百位数等等
 //
 // 算法：
-// 1. 创建一个结果列表，用来保存计算结果
-// 2. 个位数相加。将两个链表头节点相加，若和大于等于 10，则向下一位进 1，否则进 0
-// 3. 两个十位数、进位的数相加。若和大于等于十，则向下一位进 1，否则进 0
-// 4. 以此类推，计算其他位，逐个添加到结果链表中。
+//  1. 创建一个结果列表，用来保存计算结果
+//  2. 使用两个指针同步遍历两个链表：
+//     相同数位上的数相加，若和 s 大于等于 10，则向下一位进 1，并将 s-10 添加到结果链表。
+//     否则进 0，将 s 添加到结果链表
+//
+// 容易遗漏处理的 case：最高位计算后，还要进 1
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	if l1 == nil {
 		return l2
@@ -17,7 +19,7 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	}
 
 	dummyHead := &ListNode{}
-	current := dummyHead
+	tail := dummyHead
 
 	p1, p2 := l1, l2
 	carry := 0 // 进位的数
@@ -25,27 +27,30 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	// 因为即使某个链表较短，也要将其对应的值置为 0
 	// v1, v2 := 0, 0
 	for p1 != nil || p2 != nil {
-		v1, v2 := 0, 0
+		// v1, v2 := 0, 0
+		s := carry
 		if p1 != nil {
-			v1 = p1.Val
+			// v1 = p1.Val
+			s += p1.Val
 			p1 = p1.Next
 		}
 		if p2 != nil {
-			v2 = p2.Val
+			// v2 = p2.Val
+			s += p2.Val
 			p2 = p2.Next
 		}
-		sum := v1 + v2 + carry
-		carry = sum / 10
-		current.Next = &ListNode{
-			Val: sum % 10,
+
+		carry = s / 10
+		tail.Next = &ListNode{
+			Val: s % 10,
 		}
-		current = current.Next
+		tail = tail.Next
 	}
 
 	// 这个 case 很容易遗漏。
 	// 例如 5 加 5，两个链表同时遍历完，但产生了一个进位数 1
 	if carry > 0 {
-		current.Next = &ListNode{
+		tail.Next = &ListNode{
 			Val: carry,
 		}
 	}

@@ -1,7 +1,9 @@
 package linkedlist
 
+// https://leetcode.cn/problems/remove-nth-node-from-end-of-list/
+
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
-	len := lenOf(head)
+	len := LenOf(head)
 	nFromHead := len - (n - 1)
 
 	dummyHead := &ListNode{Next: head}

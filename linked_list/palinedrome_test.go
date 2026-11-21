@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// https://leetcode.cn/problems/palindrome-linked-list/description/
+
 func isPalindrome(head *ListNode) bool {
 	reversed := reverseAndClone(head)
 	node, reversedNode := head, reversed
@@ -158,7 +160,7 @@ func isPalindrome3(head *ListNode) bool {
 	if head == nil {
 		return true
 	}
-	palindrome, _ := isPalindromeRecurse(head, lenOf(head))
+	palindrome, _ := isPalindromeRecurse(head, LenOf(head))
 	return palindrome
 }
 

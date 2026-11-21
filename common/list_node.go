@@ -49,7 +49,7 @@ func NewLinked(list []int) *ListNode {
 	return dummyHead.Next
 }
 
-func lenOf(head *ListNode) int {
+func LenOf(head *ListNode) int {
 	count := 0
 	p := head
 	for p != nil {

@@ -1,14 +1,23 @@
 package linkedlist
 
-/**
- * Definition for singly-linked list.
- * type ListNode struct {
- *     Val int
- *     Next *ListNode
- * }
- */
-
+// 创建一个结果列表，遍历输入链表，逐个头插到结果列表
 func reverseBookList(head *ListNode) []int {
+	// dummyHead := &ListNode{}
+	result := make([]int, 0)
+	p := head
+	for p != nil {
+		next := p.Next
+		// p.Next = dummyHead.Next
+		// dummyHead.Next = p
+		result = append([]int{p.Val}, result...)
+		p = next
+	}
+	// return dummyHead.Next
+	return result
+}
+
+// 递归实现，定义全局结果变量
+func reverseBookList2(head *ListNode) []int {
 	result := make([]int, 0)
 	var reverse func(*ListNode)
 	// 用闭包直接捕获外层的 result 变量
@@ -23,7 +32,9 @@ func reverseBookList(head *ListNode) []int {
 	return result
 }
 
-func reverseBookList2(head *ListNode) []int {
+// 递归实现，定义全局结果列表，但不通过闭包直接访问全局列表，
+// 而是递归调用时传入全局列表的指针，在递归调用中，直接修改指针所指向的变量
+func reverseBookList3(head *ListNode) []int {
 	result := make([]int, 0)
 	var reverse func(*ListNode, *[]int)
 	reverse = func(head *ListNode, result *[]int) {
@@ -38,7 +49,8 @@ func reverseBookList2(head *ListNode) []int {
 	return result
 }
 
-func reverseBookList3(head *ListNode) []int {
+// 递归实现，不定义全局结果列表，而是返回子链表反转后的列表
+func reverseBookList4(head *ListNode) []int {
 	var reverse func(*ListNode) []int
 	reverse = func(head *ListNode) []int {
 		if head == nil {
