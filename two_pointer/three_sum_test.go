@@ -2,23 +2,24 @@ package twopointer
 
 import "slices"
 
-// https://leetcode.cn/problems/3sum/description/
+// https://leetcode.cn/problems/3sum/
 
-// 既然是求满足条件的数对，那么先将问题分解为：
-// 1. 怎么划分数对？
-// 2. 判断数对是否满足要求
+// 既然是求满足条件的数对，那么首要问题，或者说最基本的问题是：怎么划分数对？
 
 // 算法思路：
-// 求和为零的三个元素：先从数组中选择一个元素作为其中之一，再计算另两个元素的和是多少，
-// 这样就把三数之和分解为数组遍历、计算两数之和
+// 遍历数组，把当前元素作为第一个数 a，然后在数组的剩余部分找和为 target-a 的所有数对。
+// 这样就把三数之和分解为遍历数组确定第一个数 a 和两数之和问题了。
 //
-// 如何判断可行解是否重复？
-//  1. 添加新解时，遍历解列表逐个比对是否相同
-//  2. 将每个可行解转换为字符串，用它作为这个可行解的唯一标识，放入哈希表。
-//  3. 外层循环中，若当前元素跟前一个相等，则跳过后续逻辑，直接下一次迭代；
-//     计算两数之和时，若 low 跟前一个相等，或者 high 跟后一个相等，也需跳过，直接下一次迭代。
-//     为什么计算两数之和也需要去重？例如：[0,0,0,0]，取第一个作为解的第一个，剩余计算两数之和
-//     依然会产出重复解
+// 如何判断答案是否重复？
+//  1. 添加答案时，遍历答案元素列表，逐个比对是否相同
+//  2. 将每个答案转换为字符串，用它作为答案的唯一标识，放入哈希表用来判重
+//  3. 第 1 层循环确定的是第 1 个数，因此在该层循环的开头判断当前元素是否跟前一个相等，
+//     若相等则跳过后续逻辑，进行下次迭代，这样就实现了对第 1 个数的去重。
+//     第 2 层循环确定的是后两个数，因此在这层循环的开头对第 2 个数进行去重，去重逻辑类似。
+//     对前两个数去重后，实际上不需要对第三个数去重了，因为只要前两个数不同，答案肯定不重复
+//
+// 为什么计算两数之和也需要去重？
+// 因为输入 [0,0,0,0]，取第一个作为答案的第一个数，在剩余部分上计算两数之和依然会产出重复解
 
 func threeSum(nums []int) [][]int {
 	if len(nums) < 3 {
@@ -29,26 +30,29 @@ func threeSum(nums []int) [][]int {
 	slices.Sort(nums)
 	result := make([][]int, 0)
 
-	for i, v := range nums {
-		if i > 0 && nums[i] == nums[i-1] { // 去除解中第一个元素的重复
+	for i, a := range nums {
+		if i > 0 && nums[i] == nums[i-1] { // 对答案的第一个数去重
 			continue
 		}
 		low, high := i+1, n-1
-		twoSum := 0 - v
+		twoSum := -a
 		for low < high {
-			if low > i+1 && nums[low] == nums[low-1] { // 去除解中第二个元素的重复
+			if low > i+1 && nums[low] == nums[low-1] { // 对答案的第二个数去重
 				low++
 				continue
 			}
-			if high < n-1 && nums[high] == nums[high+1] { // 去除解中第三个元素的重复
+			// 不需要对答案的第三个数去重
+			// if high < n-1 && nums[high] == nums[high+1] { // 对答案的第三个数去重
+			// 	high--
+			// 	continue
+			// }
+			s := nums[low] + nums[high]
+			if s == twoSum {
+				result = append(result, []int{a, nums[low], nums[high]})
+				// low++ or high-- 也可。但更推荐如下写法，因为每个元素只能用一次
+				low++
 				high--
-				continue
-			}
-			sum := nums[low] + nums[high]
-			if sum == twoSum {
-				result = append(result, []int{v, nums[low], nums[high]})
-				high-- // or low++ or low++&&high--
-			} else if sum < twoSum {
+			} else if s < twoSum {
 				low++
 			} else {
 				high--
@@ -59,50 +63,47 @@ func threeSum(nums []int) [][]int {
 	return result
 }
 
-// 将两数之和提取为函数的实现版本
+// 此实现版本将两数之和问题的求解提取为单独的函数
 func threeSum2(nums []int) [][]int {
 	if len(nums) < 3 {
 		return nil
 	}
 
 	slices.Sort(nums)
-
 	result := make([][]int, 0)
-	for i, v := range nums {
-		if i > 0 && v == nums[i-1] { // 去除第一个元素的重复
+	for i, a := range nums {
+		if i > 0 && a == nums[i-1] { // 对答案的第一个数去重
 			continue
 		}
-		solutions := twoSum(nums, i+1, 0-v)
-		for _, list := range solutions {
-			result = append(result, append([]int{v}, list...))
+		solutions := twoSum(nums, i+1, -a)
+		for _, pair := range solutions {
+			result = append(result, append([]int{a}, pair...))
 		}
 	}
 	return result
 }
 
-//  1. 先划分出数对：创建两个指针，low、high，分别指向 0、n-1
-//  2. 若数对和大于 target，high--；若小于，low++；
-//     若等于，找到一个可行解，然后 h-- 或 l++。
-//     注意，low high 指针不能往回走，否则就会产出重复解
-//     重复上述步骤，直到 low 大于等于 high
-
+// 双指针实现思路
 func twoSum(nums []int, start, target int) [][]int {
 	result := make([][]int, 0)
 	low, high := start, len(nums)-1
 	for low < high {
-		if low > start && nums[low] == nums[low-1] { // 去除第二个元素的重复
+		if low > start && nums[low] == nums[low-1] { // 对答案的第二个数去重
 			low++
 			continue
 		}
-		if high < len(nums)-1 && nums[high] == nums[high+1] { // 去除第三个元素的重复
-			high--
-			continue
-		}
-		sum := nums[low] + nums[high]
-		if sum == target {
+		// 不需要对答案的第三个数去重
+		// if high < len(nums)-1 && nums[high] == nums[high+1] { // 对答案的第三个数去重
+		// 	high--
+		// 	continue
+		// }
+		s := nums[low] + nums[high]
+		if s == target {
 			result = append(result, []int{nums[low], nums[high]})
-			high-- // or low++ or high-- && low++
-		} else if sum < target {
+			// low++ or high-- 也可。但更推荐如下写法，因为每个元素只能用一次
+			low++
+			high--
+		} else if s < target {
 			low++
 		} else {
 			high--

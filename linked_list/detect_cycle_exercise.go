@@ -10,7 +10,7 @@ package linkedlist
 //     让 slow 从链表头开始，fast 从相遇位置开始，每次移动一个节点。当它们再次相遇时，
 //     相遇位置就是入环节点。所谓【路程相等】，意思是：此时若让两个指针分别从相遇位置和
 //     链表头出发，每次移动一个节点，那么环上指针可以一直转圈圈，以等待跟另一个指针相遇。
-func detectCycle_exercise(head *ListNode) *ListNode {
+func detectCycle_(head *ListNode) *ListNode {
 	// 1. 检测是否有环
 	hasCycle := false
 	slow, fast := head, head

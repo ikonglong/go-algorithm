@@ -2,7 +2,7 @@ package linkedlist
 
 // 1. 先把倒数第 k 个转换为正数第 n-k+1 个
 // 2. 删除第 n-k+1 个节点
-func removeNthFromEnd_exercise(head *ListNode, n int) *ListNode {
+func removeNthFromEnd_(head *ListNode, n int) *ListNode {
 	len := LenOf(head)
 	// 倒数第 n 个的前一个节点
 	kthFromStart := len - n
@@ -22,7 +22,7 @@ func removeNthFromEnd_exercise(head *ListNode, n int) *ListNode {
 
 // 借助递归思想，递进到尾节点后在归的过程中对节点计数。
 // 回归到倒数第 n 个节点的前一个节点的调用中进行删除操作
-func removeNthFromEnd_exercise2(head *ListNode, n int) *ListNode {
+func removeNthFromEnd2_(head *ListNode, n int) *ListNode {
 	count := 0
 	var traverse func(*ListNode)
 	traverse = func(head *ListNode) {

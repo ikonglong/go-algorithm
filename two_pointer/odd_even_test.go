@@ -3,95 +3,102 @@ package twopointer
 // https://leetcode.cn/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/
 
 // 算法思路：
-// 把数组看成三个区间：两端已经归类，中间还未处理。
-// pa、pb 从数组两端向中间推进，像两道向内收拢的边界：
-//
-//     [ 已确认的奇数 |      待处理区间      | 已确认的偶数 ]
-//                  pa →               ← pb
-//
-// pa 左侧 [0, pa) 都是奇数，，pa 是奇数区间的右侧开边界。
-// pb 右侧 (pb, n-1] 都是偶数，pb 是偶数区间的左侧开边界。
-// [pa, pb] 是待处理区间；初始覆盖整个数组，两端的已归类区间都为空。
+// 1. 创建两个指针 low、high，分别指向第一个和最后一个元素
+// 2. 使用 low 和 high 遍历数组，直到 low 大于等于 high
+//		a. low 从左向右找偶数，找到就停住
+//		b. high 从右向左找奇数，找到就停住
+//      c. 当 low、high 分别停在偶数、奇数上时，交换它们
+//    	d. low 右移、high 左移
 
 func trainingPlan(actions []int) []int {
-	// 埋有 bug：pa 未找到偶数时，要右移 pa；此时 pb 还未检查，因此不应该左移
-	// for pa, pb := 0, len(actions)-1; pa < pb; pa, pb = pa+1, pb-1 {
-	for pa, pb := 0, len(actions)-1; pa < pb; {
-		// 犯了很愚蠢的错误：pa&1 == 1
-		if actions[pa]&1 == 1 { // 找到奇数，跳过后续逻辑，继续找，直到找到偶数
-			pa++
-			continue
+	lo, hi := 0, len(actions)-1
+	for lo < hi {
+		// lo < hi 防止 lo 越界
+		// 让 lo 停在偶数上
+		for lo < hi && actions[lo]&1 == 1 {
+			lo++
 		}
-		if actions[pb]&1 == 0 { // 找到偶数，跳过后续逻辑，继续找，直到找到奇数
-			pb--
-			continue
+		// hi > lo 防止 hi 越界
+		// 让 hi 停在奇数上
+		for hi > lo && actions[hi]&1 == 0{
+			hi--
 		}
-		// pa、pb 分别指向偶数、奇数，交换
-		actions[pa], actions[pb] = actions[pb], actions[pa]
-		pa++
-		pb--
+
+		actions[lo], actions[hi] = actions[hi], actions[lo]
+		// 这两句非必需。因为后续迭代中循环体开头的逻辑会移动它们
+		lo++
+		hi--
 	}
 	return actions
 }
 
-// 虽能工作，但实现挺蠢
-//
-// 每轮处理：
-// 1. pa 向右跳过奇数，找到一个“应该放到右边”的偶数。
-// 2. pb 向左跳过偶数，找到一个“应该放到左边”的奇数。
-// 3. 若指针未交错，就交换这两个放错位置的数，再让指针各向内移动一步。
-// 跳过或交换元素都会扩大已归类区间，直到 pa > pb，中间再无待处理元素。
-//
-// 例如，用 | 分隔三个区间：
-//
-//	[1 | 2, 4, 3, 5 | 6]      跳过两端的 1、6，pa 停在 2，pb 停在 5
-//	[1, 5 | 4, 3 | 2, 6]      交换 2、5，两个指针向内移动
-//	[1, 5, 3 | 空 | 4, 2, 6]  再交换 4、3，待处理区间为空，结束
-//
-// 两个指针都只向内移动，时间 O(n)，额外空间 O(1)；不保证同类元素的原有顺序。
+// 将前一个版本中内嵌的 for 循环拉平
 func trainingPlan2(actions []int) []int {
-	// 每个迭代开始时，actions[pa]、actions[pb] 都未处理
-	for pa, pb := 0, len(actions)-1; pa <= pb; {
-		// 从左向右找偶数
-		for pa <= pb && actions[pa]&1 != 0 {
-			pa++
+	lo, hi := 0, len(actions)-1
+	for lo < hi {
+		// 找到偶数，停住。continue 的目的是跳过剩余逻辑，只做让 pa 停在偶数上这件事
+		if actions[lo]&1 == 1 {
+			lo++
+			// 注意，continue 虽然写在 if 块中，但它影响的并不是
+			// if 块的执行，而是最近的 for 循环体逻辑的执行
+			continue
 		}
-		// 从右向左找奇数
-		for pa <= pb && actions[pb]&1 == 0 {
-			pb--
+		// 找到奇数，停住。continue 的目的是跳过剩余逻辑，只做让 pb 停在奇数上这件事
+		if actions[hi]&1 == 0 {
+			hi--
+			continue
 		}
-		// 交换偶数、奇数
-		if pa <= pb {
-			actions[pa], actions[pb] = actions[pb], actions[pa]
-			pa++
-			pb--
-		}
+
+		// 在 pa、pb 分别停在偶数、奇数上之前，不能执行下面的逻辑
+		actions[lo], actions[hi] = actions[hi], actions[lo]
+		// 这两句非必需。因为后续迭代中循环体开头的逻辑会移动它们
+		lo++
+		hi--
 	}
 	return actions
 }
 
-// 虽能工作，但实现挺蠢
-//
 // 算法思路：
-//  1. 从 i=0 开始遍历数组。i 既表示奇数区间的右侧开边界，又表示未处理区间的左侧闭边界。
-//  2. 每次迭代：
-//     从 j=i 开始遍历数组，直到寻找奇数或遍历完成。
-//     若未找到，就结束外层循环或直接返回。
-//     若找到，就交换 actions[i] 和 actions[j]
-
+// 1. [0, p) 是奇数区间，[p, n-1] 既是待处理区间，又表示偶数区间。初始时 p = 0，即奇数区间为空
+//    	注意理解如下几点：
+//    	a. p 是【下一个奇数要存放的位置】，是奇数区间的右开边界，也是待处理区间的左闭边界
+//    	b. [p, n-1] 既是待处理区间，也表示偶数区间，因为当将其中所有的奇数都交换至奇数区
+//         间后，它就是偶数区间了
+// 2. 用 i 遍历待处理区间
+// 		a. i 向右扫描，找到奇数就停住
+//		b. 此时，必然是 p 停在偶数上，i 停在奇数上，交换它们
+//      c. 右移 p，让它指向【下一个奇数要存放的位置】
+//      d. 交换后必须右移 i，确保 i >= p。若发生 i < p，逻辑就不对了
 func trainingPlan3(actions []int) []int {
-	for i := 0; i < len(actions); {
-		// 寻找奇数
-		j := i
-		for ; j < len(actions) && actions[j]&1 == 0; j++ {
-		}
-		// 没有奇数
-		if j == len(actions) {
-			break
+	n := len(actions)
+	p := 0 // 下一个奇数要存放的位置
+	for i:=p; i < n && p <= i; {
+		// 找到奇数，停住
+		if actions[i]&1 != 1 {
+			i++
+			continue
 		}
 
-		actions[i], actions[j] = actions[j], actions[i]
+		actions[p], actions[i]=actions[i], actions[p]
+		p++
+		// 交换后必须右移 i，确保 i >= p。若发生 i < p，逻辑就不对了
 		i++
+	}
+	return actions
+}
+
+// 上一个版本的简洁写法，用来对比理解
+func trainingPlan4(actions []int) []int {
+	p := 0
+	for i := 0; i < len(actions); i++ {
+		// 找到奇数，停住
+		if actions[i]&1 != 1 {
+			// i++
+			continue
+		}
+
+		actions[p], actions[i] = actions[i], actions[p]
+		p++
 	}
 	return actions
 }

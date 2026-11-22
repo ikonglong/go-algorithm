@@ -3,7 +3,7 @@ package linkedlist
 // https://leetcode.cn/problems/add-two-numbers/
 
 // 容易遗漏处理的 case：最高位计算后，还要进 1
-func addTwoNumbers_exercise(l1 *ListNode, l2 *ListNode) *ListNode {
+func addTwoNumbers_(l1 *ListNode, l2 *ListNode) *ListNode {
 	// sum := 0
 	p1 := l1
 	p2 := l2

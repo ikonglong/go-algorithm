@@ -2,7 +2,7 @@ package linkedlist
 
 // https://leetcode.cn/problems/remove-duplicates-from-sorted-list/
 
-func deleteDuplicates_exercise(head *ListNode) *ListNode {
+func deleteDuplicates_(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
 		return head
 	}
@@ -10,8 +10,8 @@ func deleteDuplicates_exercise(head *ListNode) *ListNode {
 	valMap := make(map[int]struct{})
 	valMap[head.Val] = struct{}{}
 	curr := head
-	for curr!=nil&&curr.Next!=nil {
-		if _, found:=valMap[curr.Next.Val]; found {
+	for curr != nil && curr.Next != nil {
+		if _, found := valMap[curr.Next.Val]; found {
 			curr.Next = curr.Next.Next
 			// 因为 curr.next 变化了，所以不应该移动 curr
 			// curr = curr.Next
