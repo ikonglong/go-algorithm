@@ -1,12 +1,17 @@
 package backtrack
 
-// https://leetcode.cn/problems/TVdhkn/description/
+// https://leetcode.cn/problems/subsets/
+// https://leetcode.cn/problems/TVdhkn/
 // 对比 backtrack/permute_test.go
 //
 // 这个实现是如何做到不生成重复组合的呢？
 // 每层递归只处理 k 位置的元素，并且只有两个选择：选或不选。
 // 随后，k 只会递增，不会回头。因此，元素始终按照它们在原始集合中的顺序加入到
 // path 中，因此不会生成 [2, 1]，因为处理完 2 后不能返回去选择 1。
+
+// 把一个具体的子集看作是一个背包
+// 一个子集最多可由几个元素组成，就有几个决策阶段
+// 每个决策阶段决定：输入列表中的一个元素是否放入当前子集
 func subsets(nums []int) [][]int {
 	result := make([][]int, 0)
 

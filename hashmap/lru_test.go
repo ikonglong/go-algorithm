@@ -112,18 +112,3 @@ func (this *LRUCache) addAsHead(node *DLinkedNode) {
 func (this *LRUCache) IsFull() bool {
 	return this.size == this.capacity
 }
-
-// 双向链表
-type DLinkedNode struct {
-	Key  int // 对应 node 持有的业务对象的查找键
-	Val  int
-	Prev *DLinkedNode
-	Next *DLinkedNode
-}
-
-/**
- * Your LRUCache object will be instantiated and called as such:
- * obj := Constructor(capacity);
- * param_1 := obj.Get(key);
- * obj.Put(key,value);
- */

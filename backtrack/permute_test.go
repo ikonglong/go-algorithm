@@ -7,85 +7,61 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// https://leetcode.cn/problems/VvJkup/description/
+// https://leetcode.cn/problems/permutations/
+// https://leetcode.cn/problems/VvJkup/
+// 需要关注输入集合是否有序，是否重复
+
 // 对比 backtrack/subsets_test.go
 // 更推荐这个版本
 func permute(nums []int) [][]int {
 	result := make([][]int, 0)
+	n := len(nums)
 
-	// 决策阶段：集合元素中的每个元素对应一个阶段
-	// 选择列表：因为是排列，所以处理 nums[k] 只有一种选择：添加进 path。
-	//         且需要更改下一阶段的选择列表，即将已处理的元素从选择列表中移除。
-	//         这里选择不用单独的对象表示选择列表，从 nums 中动态过滤出选择列表
+	// 决策阶段：一个排列包含多少个元素，就有多少个决策阶段
+	// 选择列表：对于阶段 k，意味着前面已完成了阶段 1-(k-1)，那么当前阶段有 n-k+1 个选择
 	// 路径：保存已添加到当前排列中的元素
-	var backtrack func(nums []int, k int, path []int)
-	backtrack = func(nums []int, k int, path []int) {
-		// 结束条件
-		if k == len(nums) {
-			result = append(result, append([]int(nil), path...))
-			return
-		}
-
-		// 对于一个具体排列，假设已选出 k 个元素，
-		// 那么对于第 k+1 个就有 n-k 个选择，每一种选择都需要遍历
-		// 由于这个实现选择不用单独的对象表示选择列表，因此需要遍历
-		// 整个 nums，然后动态判断是否是可用选择
-		for _, item := range nums {
-			if slices.Contains(path, item) { // 是否是不可用选择
-				continue
-			}
-
-			path = append(path, item)
-			backtrack(nums, k+1, path)
-			// 恢复
-			path = path[:len(path)-1]
-		}
-	}
-
-	backtrack(nums, 0, []int{})
-	return result
-}
-
-func permute2(nums []int) [][]int {
-	result := make([][]int, 0)
-
-	var backtrack func(int, []int, []int)
+	var backtrack func(k int, path []int)
 	// 不能像下面这样声明与定义一行语句搞定，因为函数内部会递归调用其自身，
 	// 导致报告：undefined: backtrack。必须先声明，再定义。
-	// backtrack := func(k int, options []int, path []int) {
-	backtrack = func(k int, options []int, path []int) {
-		if k == len(nums) {
+	// backtrack := func(k int, path []int) {
+	backtrack = func(k int, path []int) {
+		// 结束条件
+		if k == n {
 			// path 虽然是值传递（slice header 按值复制），但底层数组是共享的：
-			// 初始 cap=3，整棵递归树上所有分支的 append 都复用同一块数组，
-			// 后续分支会继续改写它。所以这里必须拷贝一份，再存入 result。
+			// 整棵递归树上所有分支的 append 都操作同一个底层数组，这意味着后续
+			// 分支会继续改写它。所以这里必须拷贝一份，再存入 result。
 			result = append(result, append([]int(nil), path...))
-			// 拷贝后，DST 为空列表，不是期望结果
-			// dst := make([]int, 0, len(path))
+			// dst := make([]int, 0, len(path)) // 拷贝后 dst 为空列表，不符合预期
 			// dst := make([]int, len(path)) // 这样才 OK
-			// _ = copy(dst, path)
+			// copy(dst, path)
 			// result = append(result, dst)
 			return
 		}
 
-		for _, opt := range options {
-			// 这里选择不更改选择列表，在每次循环开始时，动态过滤出当前阶段对应的选择
-			if slices.Contains(path, opt) { // Go 1.21 之前标准库并不支持
+		// 对于一个具体排列，假设已选出 k 个元素，
+		// 那么对于第 k+1 个就有 n-k 个选择，每一种选择都需要尝试
+		for _, item := range nums {
+			// 如果 path 已包含当前元素，则表明已完成的阶段选择了它，
+			// 那么当前阶段就应该跳过它
+			if slices.Contains(path, item) {
 				continue
 			}
-			path = append(path, opt)
-			backtrack(k+1, options, path)
-			// 撤销前面做出的选择，恢复递归调用节点状态，以尝试其他选择
+
+			// 尝试一个选择
+			path = append(path, item)
+			backtrack(k+1, path)
+			// 撤销为当前选择所做的变更，恢复当前递归调用节点状态，以尝试其他选择
 			path = path[:len(path)-1]
 		}
 	}
 
-	backtrack(0, nums, make([]int, 0, 3))
+	backtrack(0, nil)
 	return result
 }
 
 // 这个实现版本，在循环中不再动态过滤出当前阶段对应的选择列表，
 // 而是在发起下一个阶段的调用前后，更改和恢复选择列表
-func permute3(nums []int) [][]int {
+func permute2(nums []int) [][]int {
 	result := make([][]int, 0)
 
 	var backtrack func(int, []int, []int)
@@ -124,6 +100,66 @@ func permute3(nums []int) [][]int {
 	return result
 }
 
+func permute3_bug(nums []int) [][]int {
+	result := make([][]int, 0)
+	n := len(nums)
+	var backtrack func(k int, options []int, path []int)
+	backtrack = func(k int, options []int, path []int) {
+		if k == n {
+			ans := make([]int, n)
+			copy(ans, path)
+			result = append(result, path)
+			return
+		}
+
+		for i, e := range options {
+			path = append(path, e)
+			// 如果这里选择变更 options 列表，为下个阶段准备参数，
+			// 那么递归调用之后，就需将 options 恢复原样，以尝试其他选择
+			//
+			// Bug: 拼出来的长度只有 len(options)-1，原有容量一定够，
+			// 所以 append 不会创建新数组，而是直接把后半段往前覆盖。
+			// 这导致为了给下个阶段准备参数，意外地修改了 options 底层数组
+			nextOpts := append(options[0:i], options[i+1:]...)
+			backtrack(k+1, nextOpts, path)
+			// 恢复状态以尝试其他选择
+			path = path[0 : len(path)-1]
+		}
+	}
+	backtrack(0, nums, nil)
+	return result
+}
+
+// 这个实现版本有严重且难以诊断的 bug。主要 bug 如下（从上面注释中的完整调用树提取出来的）：
+// backtrack(k=0, options=[1,2,3], path=[])
+// │
+// │  迭代 i=0, opt=1:
+// │    ① path=[]，append(1) → path=[1]
+// │    ② options=options[1:]=[2,3]
+// │    ③ backtrack(k=1, options=[2,3], path=[1])
+// │    ④ path=[]
+// │    ⑤ options=append([1],[2,3])=[1,2,3]  ✓ 恢复完整
+// │
+// │  迭代 i=1, opt=2:
+// │    ① path=[]，append(2) → path=[2]
+// │    ② options=options[2:]=[3]      ✗ 错点3：丢掉前缀 [1]（应删 i 本身，剩 [1,3]）
+// │    ③ backtrack(k=1, options=[3], path=[2])
+// │    ④ path=[]
+// │    ⑤ options=append([2],[3])=[2,3]   ✗ 错点4：元素 1 永久丢失（应为 [1,2,3]）→ 直接导致下一轮 i=2 越界
+// │
+// │  迭代 i=2, opt=3:
+// │    ① path=[]，append(3) → path=[3]
+// │    ② i+1=3，len(options)=2（此时 options=[2,3]），3≠2
+// │       → options=options[3:] → 💥 panic: slice bounds out of range [3:2]
+//
+// 导致上述 bug 的思考路径：思考这个实现思路时，脑袋里想的场景是第一次循环 i = 1，
+// 在这次循环中，确实正确恢复了 options，就以为这个思路是可行的。但当第二次循环
+// i = 2 时，循环变量 opt 只可能保存当前循环访问的元素，不可能保存前一次循环访问的元素，
+// 因此恢复时就不可能恢复前一/几次循环访问的元素。
+//
+//
+// 这个实现版本不止这一个 bug，还有其他 bug，具体请看下面的完整调用树。
+//
 // 迭代体 5 条语句：
 // ① 做选择        path = append(path, opt)
 // ② 缩窄选择列表  options = options[i+1:]
@@ -209,35 +245,7 @@ func permute3(nums []int) [][]int {
 //
 // 区分：原地改元素（如 options[0]=9，共享底层数组）后续轮次可见；给变量换 header 循环看不见。
 
-// 这个实现版本有严重且难以诊断的 bug。主要 bug 如下（从上面注释中的完整调用树提取出来的）：
-// backtrack(k=0, options=[1,2,3], path=[])
-// │
-// │  迭代 i=0, opt=1:
-// │    ① path=[]，append(1) → path=[1]
-// │    ② options=options[1:]=[2,3]
-// │    ③ backtrack(k=1, options=[2,3], path=[1])
-// │    ④ path=[]
-// │    ⑤ options=append([1],[2,3])=[1,2,3]  ✓ 恢复完整
-// │
-// │  迭代 i=1, opt=2:
-// │    ① path=[]，append(2) → path=[2]
-// │    ② options=options[2:]=[3]      ✗ 错点3：丢掉前缀 [1]（应删 i 本身，剩 [1,3]）
-// │    ③ backtrack(k=1, options=[3], path=[2])
-// │    ④ path=[]
-// │    ⑤ options=append([2],[3])=[2,3]   ✗ 错点4：元素 1 永久丢失（应为 [1,2,3]）→ 直接导致下一轮 i=2 越界
-// │
-// │  迭代 i=2, opt=3:
-// │    ① path=[]，append(3) → path=[3]
-// │    ② i+1=3，len(options)=2（此时 options=[2,3]），3≠2
-// │       → options=options[3:] → 💥 panic: slice bounds out of range [3:2]
-//
-// 导致上述 bug 的思考路径：思考这个实现思路时，脑袋里想的场景是第一次循环 i = 1，
-// 在这次循环中，确实正确恢复了 options，就以为这个思路是可行的。但当第二次循环
-// i = 2 时，循环变量 opt 只可能保存当前循环访问的元素，不可能保存前一次循环访问的元素，
-// 因此恢复时就不可能恢复前一/几次循环访问的元素。
-//
-// 这个实现版本中不止这一个 bug，还有其他 bug，具体请看前面注释中的完整调用树。
-func permute_serious_hardtodiagnosebug(nums []int) [][]int {
+func permute4_seriousbug(nums []int) [][]int {
 	result := make([][]int, 0)
 
 	var backtrack func(int, []int, []int)

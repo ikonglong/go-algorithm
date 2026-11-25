@@ -1,4 +1,5 @@
 package recurse
+package recurse
 
 // https://leetcode.cn/problems/three-steps-problem-lcci/
 // 楼梯有 n 阶台阶，小孩一次可以上 1 阶、2 阶或 3 阶
@@ -29,8 +30,11 @@ func waysToStep(n int) int {
 // 1. 每个台阶对应一个阶段。有 n 个台阶就有 n 个阶段
 // 2. 反/逆向推导：走到第 n 个台阶，最后一步有 3 个选择，分别走 1、2、3 阶
 //
-// 状态转移表和方程：
-// dp[n+1], dp[i] 表示走到第 i 阶的走法总数
+// 状态转移表：dp[n+1]。为什么长度是 n+1？
+// 因为求 n 个台阶的走法总数，最后直接拿 n 作为下标从状态转移表读取结果
+//
+// 状态转移方程：
+// dp[i] 表示走到第 i 阶的走法总数
 // dp[i] = dp[i-1] + dp[i-2] + dp[i-3]
 func waysToStep2(n int) int {
 	mod := 1000000007
@@ -62,7 +66,7 @@ func waysToStep3(n int) int {
 	}
 	mod := 1000000007
 	dp := make([]int, n+1) // 默认值 0 表示不可达
-	dp[0] = 1              // 走到第 0 阶，走 0 步或保持原地不动，这是一种走法
+	dp[0] = 1              // 走到第 0 阶，走 0 步或原地不动，这就是 1 个走法
 	dp[1] = 1
 	dp[2] = 2
 	for i := 3; i <= n; i++ {

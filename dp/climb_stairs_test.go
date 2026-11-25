@@ -1,11 +1,16 @@
 package dp
 
-// https://leetcode.cn/problems/climbing-stairs/description/
+// https://leetcode.cn/problems/climbing-stairs/
 // 每次只能爬 1 或 2 个台阶
+//
+// 对比递归实现 recurse/climb_stairs.go
 
-// 状态转移表和方程：
-// dp[n+1]，n 是台阶总数。dp[i] 是走完 i 个台阶有几种走法
-// dp[i] = dp[i-1] + dp[i-2]
+// 有多少级台阶，就有多少个处理阶段？
+// 不对，这里无法先确定有多少个阶段，因为步长不确定。应该说，走了多少步就有多少个阶段
+//
+// 状态表：dp[n+1]，n 是台阶总数，dp[i] 是走完 i 个台阶有几种走法
+// 状态转移方程：
+// dp[i] = dp[i-1] + dp[i-2]，i-2>=0
 //
 // dp[2] = dp[1] + dp[0] 用问题领域语言解释这个式子：
 // 到达第 2 阶的所有走法，可以按最后一步跨了几阶，分成两类：
